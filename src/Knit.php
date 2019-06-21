@@ -14,24 +14,38 @@ declare(strict_types=1);
 
 namespace Comely\Knit;
 
+use Comely\Knit\Exception\CachingException;
+use Comely\Knit\Exception\TemplateException;
+
 /**
  * Class Knit
  * @package Comely\Knit
  */
 class Knit
 {
+    /** string Version (Major.Minor.Release) */
+    const VERSION = "2.2.1";
+    /** int Version (Major * 10000 + Minor * 100 + Release) */
+    const VERSION_ID = 20201;
+
+    /** @var Caching */
+    private $caching;
     /** @var Directories */
     private $dirs;
     /** @var Modifiers */
     private $modifiers;
+    /** @var Events */
+    private $events;
 
     /**
      * Knit constructor.
      */
     public function __construct()
     {
+        $this->caching = new Caching();
         $this->dirs = new Directories();
         $this->modifiers = new Modifiers();
+        $this->events = new Events();
     }
 
     /**
@@ -48,5 +62,41 @@ class Knit
     public function modifiers(): Modifiers
     {
         return $this->modifiers;
+    }
+
+    /**
+     * @return Caching
+     * @throws CachingException
+     */
+    public function caching(): Caching
+    {
+        if (!$this->dirs->cache) {
+            throw new CachingException('Cache directory is not set');
+        }
+
+        return $this->caching;
+    }
+
+    /**
+     * @return Events
+     */
+    public function events(): Events
+    {
+        return $this->events;
+    }
+
+    /**
+     * @param string $fileName
+     * @return Template
+     * @throws TemplateException
+     */
+    public function template(string $fileName): Template
+    {
+        $templatesDirectory = $this->dirs()->templates;
+        if (!$templatesDirectory) {
+            throw new TemplateException('Knit base templates directory not set');
+        }
+
+        return new Template($this, $templatesDirectory, $fileName);
     }
 }
