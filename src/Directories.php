@@ -45,7 +45,7 @@ class Directories
                 return $this->$dir;
         }
 
-        throw new \DomainException('Cannot access inaccessible property');
+        throw new \DomainException('Cannot get value of inaccessible property');
     }
 
     /**
