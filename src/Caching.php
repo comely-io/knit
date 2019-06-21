@@ -17,6 +17,9 @@ namespace Comely\Knit;
 /**
  * Class Caching
  * @package Comely\Knit
+ * @property-read int $type
+ * @property-read int $ttl
+ * @property-read null|string $sessionToken
  */
 class Caching
 {

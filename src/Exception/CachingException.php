@@ -18,6 +18,6 @@ namespace Comely\Knit\Exception;
  * Class CachingException
  * @package Comely\Knit\Exception
  */
-class CachingException extends KnitException
+class CachingException extends TemplateException
 {
 }
