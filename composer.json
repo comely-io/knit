@@ -1,0 +1,28 @@
+{
+  "name": "comely-io/knit",
+  "description": "Knit — official Comely HTML templating engine ",
+  "type": "library",
+  "homepage": "https://github.com/comely-io/knit",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Furqan A. Siddiqui",
+      "email": "hello@furqansiddiqui.com",
+      "homepage": "https://www.furqansiddiqui.com",
+      "role": "Author"
+    }
+  ],
+  "require": {
+    "php": "^7.1",
+    "comely-io/data-types": "^1.0.23",
+    "comely-io/filesystem": "^1.0.10"
+  },
+  "autoload": {
+    "psr-4": {
+      "Comely\\Knit\\": [
+        "src"
+      ]
+    }
+  },
+  "minimum-stability": "dev"
+}
