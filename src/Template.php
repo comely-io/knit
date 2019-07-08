@@ -59,9 +59,11 @@ class Template
     {
         try {
             $filePath = $directory->suffix($fileName);
-            if (pathinfo($filePath, PATHINFO_EXTENSION) !== ".knit") {
+            if (pathinfo($filePath, PATHINFO_EXTENSION) !== "knit") {
                 throw new TemplateException('Template files must have ".knit" extension');
             }
+        } catch (TemplateException $e) {
+            throw $e;
         } catch (\Exception $e) {
             throw new TemplateException('Invalid template file name');
         }
