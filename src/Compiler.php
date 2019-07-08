@@ -85,6 +85,10 @@ class Compiler
                 sprintf('An error occurred while reading template file "%s"', $this->fileName)
             );
         } catch (\Exception $e) {
+            if ($e instanceof CompilerException) {
+                throw $e;
+            }
+
             if ($e instanceof ParseException) {
                 throw new CompilerException(
                     sprintf(
