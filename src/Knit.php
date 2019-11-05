@@ -24,9 +24,9 @@ use Comely\Knit\Exception\TemplateException;
 class Knit
 {
     /** string Version (Major.Minor.Release) */
-    const VERSION = "2.2.1";
+    const VERSION = "2.2.11";
     /** int Version (Major * 10000 + Minor * 100 + Release) */
-    const VERSION_ID = 20201;
+    const VERSION_ID = 20211;
 
     /** @var Caching */
     private $caching;
