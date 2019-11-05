@@ -74,7 +74,7 @@ trait ParseIf
         if (array_key_exists(1, $pieces)) {
             // Operator
             if (!in_array($pieces[1], ["===", "==", "!=", "!==", ">=", "<=", ">", "<"])) {
-                throw $this->exception(sprintf('Operator %s not supported', $pieces[2]));
+                throw $this->exception(sprintf('Operator %s not supported', $pieces[1]));
             }
 
             $statement[] = $pieces[1];
