@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * This file is a part of "comely-io/knit" package.
  * https://github.com/comely-io/knit
  *
@@ -21,11 +21,11 @@ namespace Comely\Knit\Compiler;
 class CompiledTemplate
 {
     /** @var string */
-    public $compiledFile;
+    public string $compiledFile;
     /** @var string */
-    public $templateName;
+    public string $templateName;
     /** @var int */
-    public $timeStamp;
-    /** @var float */
-    public $timer;
+    public int $timeStamp;
+    /** @var int|float */
+    public int|float $timer;
 }

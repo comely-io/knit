@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * This file is a part of "comely-io/knit" package.
  * https://github.com/comely-io/knit
  *
@@ -31,22 +31,20 @@ use Comely\Knit\Knit;
  */
 class Parser
 {
-    /** @var Knit */
-    private $knit;
     /** @var Directory */
-    private $directory;
+    private Directory $directory;
     /** @var string */
-    private $source;
+    private string $source;
     /** @var array */
-    private $clauses;
+    private array $clauses = ["count" => [], "foreach" => [], "if" => 0];
     /** @var bool */
-    private $literal;
+    private bool $literal = false;
     /** @var Variables */
-    private $reserved;
+    private Variables $reserved;
     /** @var int */
-    private $line;
+    private int $line = 0;
     /** @var null|string */
-    private $token;
+    private ?string $token = null;
 
     use ParseCount;
     use ParseForeach;
@@ -61,19 +59,22 @@ class Parser
      * @param Variables|null $reserved
      * @param Directory|null $directory
      */
-    public function __construct(Knit $knit, string $source, ?Variables $reserved = null, ?Directory $directory = null)
+    public function __construct(private Knit $knit, string $source, ?Variables $reserved = null, ?Directory $directory = null)
     {
-        $this->knit = $knit;
-        $this->directory = $directory ?? $this->knit->dirs()->templates;
+        $directory = $directory ?? $this->knit->dirs()->templates;
+        if (!$directory) {
+            throw new \UnexpectedValueException('No template or default templates directory set');
+        }
+
+        $this->directory = $directory;
         $this->source = $source;
-        $this->clauses = ["count" => [], "foreach" => [], "if" => 0];
-        $this->line = 0;
-        $this->literal = false;
         $this->reserved = $reserved ?? new Variables();
     }
 
     /**
      * @return string
+     * @throws CompilerException
+     * @throws ParseException
      */
     public function parse(): string
     {
@@ -89,12 +90,14 @@ class Parser
     /**
      * @param string $line
      * @return string|null
+     * @throws CompilerException
+     * @throws ParseException
      */
     private function line(string $line): ?string
     {
         $this->line++;
         return preg_replace_callback(
-            '/\{([^\s].+)\}/U',
+            '/{([^\s].+)}/U',
             function ($matches) {
                 return $this->tokens($matches);
             },
@@ -126,19 +129,19 @@ class Parser
                     return $this->parseIfElse();
                 } elseif (strtolower($this->token) === "/if") {
                     return $this->parseIfClose();
-                } elseif (preg_match('/^foreach\s\$[a-z\_]+[a-z0-9\_\.]*\sas\s\$[a-z]+[a-z0-9\_]*$/i', $this->token)) {
+                } elseif (preg_match('/^foreach\s\$[a-z_]+[\w.]*\sas\s\$[a-z]+[\w]*$/i', $this->token)) {
                     return $this->parseForeach();
-                } elseif (preg_match('/^foreach\s\$[a-z\_]+[a-z0-9\_\.]*\sas\s\$[a-z]+[a-z0-9\_]*\s\=\>\s\$[a-z]+[a-z0-9\_]*$/i', $this->token)) {
+                } elseif (preg_match('/^foreach\s\$[a-z_]+[\w.]*\sas\s\$[a-z]+[\w]*\s=>\s\$[a-z]+[\w]*$/i', $this->token)) {
                     return $this->parseForeachPaired();
                 } elseif (strtolower($this->token) === "foreachelse") {
                     return $this->parseForeachElse();
                 } elseif (strtolower($this->token) === "/foreach") {
                     return $this->parseForeachClose();
-                } elseif (preg_match('/^count\s\$[a-z\_]+[a-z0-9\_]*\s[0-9]+\sto\s[1-9][0-9]*$/i', $this->token)) {
+                } elseif (preg_match('/^count\s\$[a-z_]+[\w]*\s[0-9]+\sto\s[1-9][0-9]*$/i', $this->token)) {
                     return $this->parseCount();
                 } elseif (strtolower($this->token) === "/count") {
                     return $this->parseCountClose();
-                } elseif (preg_match('/^knit\s?(\'|\")[a-z0-9-_.\/]+(\'|\")$/i', $this->token)) {
+                } elseif (preg_match('/^knit\s?([\'"])[\w\-.\/]+([\'"])$/i', $this->token)) {
                     return $this->parseImport();
                 } elseif (strtolower($this->token) === "literal") {
                     $this->literal = true;
@@ -185,7 +188,7 @@ class Parser
          * // Main variable may have a directly succeeding bracket or number of properties
          * $pattern = '/^' . $var . '(' . $bracket . ')?(' . $prop . ')*$/i';
          */
-        $pattern = '/^\$[a-z\_]+[a-z0-9\_]*(\[([a-z0-9\_\-]+|\$[a-z\_]+[a-z0-9\_]*(\.[a-z0-9\_\-]+(\[[a-z0-9\_\-]+\])?)*)\])?(\.[a-z0-9\_\-]+(\[([a-z0-9\_\-]+|\$[a-z\_]+[a-z0-9\_]*(\.[a-z0-9\_\-]+(\[[a-z0-9\_\-]+\])?)*)\])?)*$/i';
+        $pattern = '/^\$[a-z_]+[\w]*(\[([\w\-]+|\$[a-z_]+[\w]*(\.[\w\-]+(\[[\w\-]+])?)*)])?(\.[\w\-]+(\[([\w\-]+|\$[a-z_]+[\w]*(\.[\w\-]+(\[[\w\-]+])?)*)])?)*$/i';
         if (!preg_match($pattern, $var)) {
             if (preg_match('/\[(\|"\')/', $var)) {
                 throw $this->exception('Quotes are not allowed inside box brackets');
@@ -197,8 +200,8 @@ class Parser
         // Check if $var has brackets
         if (strpos($var, "[")) {
             // Normalize non-variable brackets to properties
-            $var = preg_replace_callback(
-                '/\[([^\$].+)\]/U',
+            /** @noinspection RegExpDuplicateCharacterInClass */
+            $var = preg_replace_callback("/\[([^\$].+)]/U",
                 function ($matched) {
                     $property = $matched[1] ?? null;
                     if ($property) {
@@ -214,7 +217,7 @@ class Parser
             if (strpos($var, "[")) {
                 // We need to resolve inner variables now
                 $var = preg_replace_callback(
-                    '/\[(.+)\]/U',
+                    '/\[(.+)]/U',
                     function ($matched) {
                         $sub = $matched[1] ?? null;
                         if (is_string($sub)) {
@@ -280,7 +283,7 @@ class Parser
              * $modifier = '[a-z0-9\_]+((' . $var . ')|(' . $num . ')|(' . $str . '))*\|?';
              * $pattern = '/^(' . $modifier . ')*$/';
              */
-            $pattern = '/^([a-z0-9\_]+((\:\[\$.+\])|(\:\-?[0-9]+(\.[0-9]+)?)|(\:(\"|\')[a-z0-9\s\.\_\-]*(\"|\')))*\|?)*$/i';
+            $pattern = '/^([\w]+((:\[\$.+])|(:-?[0-9]+(\.[0-9]+)?)|(:(["\'])[\w\s.\-]*(["\'])))*\|?)*$/i';
             if (!preg_match($pattern, $modifiers)) {
                 throw $this->exception(
                     sprintf('Incomplete or bad variable modifiers syntax for "%s"', $varName)
@@ -290,7 +293,7 @@ class Parser
             // Check if has variables enclosed as arguments
             if (strpos($modifiers, ':[$')) {
                 $modifiers = preg_replace_callback(
-                    '/\[(\$.+)\]/U',
+                    '/\[(\$.+)]/U',
                     function ($modifierVar) {
                         $modifierVar = $modifierVar[1] ?? null;
                         if (is_string($modifierVar)) {
@@ -315,13 +318,13 @@ class Parser
                     foreach ($args as $arg) {
                         if ($arg === "null") {
                             $arguments[] = null;
-                        } elseif (preg_match('/^\-?[0-9]+(\.[0-9]+)?$/', $arg)) {
+                        } elseif (preg_match('/^-?[0-9]+(\.[0-9]+)?$/', $arg)) {
                             $arguments[] = strpos($arg, ".") ? floatval($arg) : intval($arg);
                         } elseif ($arg === "true") {
                             $arguments[] = true;
                         } elseif ($arg === "false") {
                             $arguments[] = false;
-                        } elseif (preg_match('/^(\'|\")[a-z0-9\s\.\_\-]+(\'|\")$/i', $arg)) {
+                        } elseif (preg_match('/^([\'"])[\w\s.\-]+([\'"])$/i', $arg)) {
                             $arguments[] = "'" . substr($arg, 1, -1) . "'";
                         } else {
                             $arguments[] = $arg; // append as-is
