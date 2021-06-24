@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * This file is a part of "comely-io/knit" package.
  * https://github.com/comely-io/knit
  *
@@ -22,17 +22,17 @@ use Comely\Knit\Exception\TemplateException;
  */
 class Data
 {
+    /** @var string[] */
     private const RESERVED = ["knit"];
 
     /** @var array */
-    private $data;
+    private array $data = [];
 
     /**
      * Data constructor.
      */
     public function __construct()
     {
-        $this->data = [];
         $this->data["knit"] = [
             "now" => time(),
             "get" => $_GET

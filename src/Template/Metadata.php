@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * This file is a part of "comely-io/knit" package.
  * https://github.com/comely-io/knit
  *
@@ -24,15 +24,7 @@ use Comely\Knit\Template\Metadata\MetaValueInterface;
 class Metadata implements \Iterator
 {
     /** @var array */
-    private $data;
-
-    /**
-     * Metadata constructor.
-     */
-    public function __construct()
-    {
-        $this->data = [];
-    }
+    private array $data = [];
 
     /**
      * @param string $key
@@ -42,7 +34,7 @@ class Metadata implements \Iterator
     public function add(string $key, MetaValueInterface $value): void
     {
         $key = strtolower($key);
-        if (!preg_match('/^[a-z0-9\.\_\-]{2,64}$/', $key)) {
+        if (!preg_match('/^[\w.\-]{2,64}$/', $key)) {
             throw new MetadataException('Invalid assign key for a metadata value');
         }
 
@@ -84,8 +76,8 @@ class Metadata implements \Iterator
     /**
      * @return bool
      */
-    public function valid()
+    public function valid(): bool
     {
-        return is_null(key($this->data)) ? false : true;
+        return !is_null(key($this->data));
     }
 }
