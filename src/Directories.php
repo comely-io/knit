@@ -1,5 +1,5 @@
-<?php
-/**
+<?php /** @noinspection PhpUnusedPrivateFieldInspection */
+/*
  * This file is a part of "comely-io/knit" package.
  * https://github.com/comely-io/knit
  *
@@ -26,11 +26,11 @@ use Comely\Filesystem\Directory;
 class Directories
 {
     /** @var null|Directory */
-    private $templates;
+    private ?Directory $templates = null;
     /** @var null|Directory */
-    private $compiler;
+    private ?Directory $compiler = null;
     /** @var null|Directory */
-    private $cache;
+    private ?Directory $cache = null;
 
     /**
      * @param $dir
@@ -45,7 +45,7 @@ class Directories
                 return $this->$dir;
         }
 
-        throw new \DomainException('Cannot get value of inaccessible property');
+        throw new \OutOfBoundsException('Cannot get value of inaccessible property');
     }
 
     /**

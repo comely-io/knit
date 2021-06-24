@@ -1,5 +1,5 @@
-<?php
-/**
+<?php /** @noinspection PhpUnusedPrivateFieldInspection */
+/*
  * This file is a part of "comely-io/knit" package.
  * https://github.com/comely-io/knit
  *
@@ -23,25 +23,19 @@ namespace Comely\Knit;
  */
 class Caching
 {
+    /** @var int No caching of template */
     public const NONE = 0x0a;
+    /** @var int Normal caching of template */
     public const NORMAL = 0x14;
+    /** @var int Aggressive caching */
     public const AGGRESSIVE = 0x1e;
 
     /** @var int */
-    private $type;
+    private int $type = self::NONE;
     /** @var int */
-    private $ttl;
+    private int $ttl = 0;
     /** @var string|null */
-    private $sessionToken;
-
-    /**
-     * Caching constructor.
-     */
-    public function __construct()
-    {
-        $this->disable();
-        $this->ttl = 0;
-    }
+    private ?string $sessionToken = null;
 
     /**
      * @param string $prop
