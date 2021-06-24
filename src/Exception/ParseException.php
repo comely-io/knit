@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * This file is a part of "comely-io/knit" package.
  * https://github.com/comely-io/knit
  *
@@ -21,15 +21,15 @@ namespace Comely\Knit\Exception;
 class ParseException extends CompilerException
 {
     /** @var int */
-    private $lineNum;
+    private int $lineNum;
     /** @var null|string */
-    private $token;
+    private ?string $token = null;
 
     /**
      * ParseException constructor.
      * @param string $message
      * @param int $line
-     * @param string $token
+     * @param string|null $token
      */
     public function __construct(string $message = "", int $line = 0, ?string $token = null)
     {
