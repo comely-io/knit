@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * This file is a part of "comely-io/knit" package.
  * https://github.com/comely-io/knit
  *
@@ -23,14 +23,13 @@ use Comely\Knit\Exception\ModifierException;
 class Modifiers
 {
     /** @var array */
-    private $modifiers;
+    private array $modifiers = [];
 
     /**
      * Modifiers constructor.
      */
     public function __construct()
     {
-        $this->modifiers = [];
         $this->registerCoreModifiers();
     }
 
@@ -93,7 +92,7 @@ class Modifiers
         // Translate
         $this->register("translate", function (string $var, array $args) {
             // Translation by $knit var
-            if (preg_match('/^\$this\-\>data\[(\"|\')knit(\"|\')\]$/', $var)) {
+            if (preg_match('/^\$this->data\[["\']knit["\']]$/', $var)) {
                 $translatable = $args[0] ?? null;
                 if (!is_string($translatable)) {
                     throw ModifierException::TypeError($var, "translate", 1, "string", gettype($translatable));
@@ -170,12 +169,12 @@ class Modifiers
                 }
             }
 
-            $decimalPoint = isset($args[1]) ? $args[1] : "'.'";
+            $decimalPoint = $args[1] ?? "'.'";
             if (!is_string($decimalPoint)) {
                 throw ModifierException::TypeError($var, "number_format", 2, "string", gettype($decimalPoint));
             }
 
-            $thousandsSep = isset($args[2]) ? $args[2] : "','";
+            $thousandsSep = $args[2] ?? "','";
             if (!is_string($thousandsSep)) {
                 throw ModifierException::TypeError($var, "number_format", 3, "string", gettype($thousandsSep));
             }
