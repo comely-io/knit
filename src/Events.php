@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * This file is a part of "comely-io/knit" package.
  * https://github.com/comely-io/knit
  *
@@ -24,7 +24,7 @@ use Comely\Utils\Events\EventsRegister;
 class Events
 {
     /** @var EventsRegister */
-    private $register;
+    private EventsRegister $register;
 
     /**
      * Events constructor.
