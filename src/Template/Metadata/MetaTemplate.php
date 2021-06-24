@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * This file is a part of "comely-io/knit" package.
  * https://github.com/comely-io/knit
  *
@@ -23,20 +23,13 @@ use Comely\Knit\Template;
  */
 class MetaTemplate implements MetaValueInterface
 {
-    /** @var string */
-    private $templateName;
-    /** @var array */
-    private $data;
-
     /**
      * MetaTemplate constructor.
-     * @param string $templateFile
+     * @param string $templateName
      * @param array $data
      */
-    public function __construct(string $templateFile, array $data)
+    public function __construct(private string $templateName, private array $data)
     {
-        $this->templateName = $templateFile;
-        $this->data = $data;
     }
 
     /**

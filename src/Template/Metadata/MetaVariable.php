@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * This file is a part of "comely-io/knit" package.
  * https://github.com/comely-io/knit
  *
@@ -22,8 +22,8 @@ use Comely\Knit\Exception\MetadataException;
  */
 class MetaVariable implements MetaValueInterface
 {
-    /** @var string|int|bool */
-    private $value;
+    /** @var string|int|float */
+    private string|int|float $value;
 
     /**
      * MetaVariable constructor.
@@ -32,28 +32,18 @@ class MetaVariable implements MetaValueInterface
      */
     public function __construct($value)
     {
-        $valueType = gettype($value);
-        switch ($valueType) {
-            case "string":
-            case "integer":
-            case "double":
-                $this->value = $value;
-                break;
-            case "boolean":
-                $this->value = $value ? "true" : "false";
-                break;
-            case "NULL":
-                $this->value = "null";
-                break;
-            default:
-                throw new MetadataException(sprintf('MetaVariable cannot accept value of type "%s"', $valueType));
-        }
+        $this->value = match (gettype($value)) {
+            "string", "integer", "double" => $value,
+            "boolean" => $value ? "true" : "false",
+            "NULL" => "null",
+            default => throw new MetadataException(sprintf('MetaVariable cannot accept value of type "%s"', gettype($value))),
+        };
     }
 
     /**
-     * @return bool|int|string
+     * @return string|int|float
      */
-    public function value()
+    public function value(): string|int|float
     {
         return $this->value;
     }
