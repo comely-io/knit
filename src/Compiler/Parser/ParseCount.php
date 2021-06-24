@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * This file is a part of "comely-io/knit" package.
  * https://github.com/comely-io/knit
  *
@@ -34,12 +34,8 @@ trait ParseCount
 
         // Return count statement
         $this->clauses["count"][] = ["close" => 1, "var" => $index];
-        return sprintf(
-            '<?php for(%1$s=%2$d;%1$s<=%3$d;%1$s++) { ?>',
-            $index,
-            intval($pieces[2]),
-            intval($pieces[4])
-        );
+        $forStmt = sprintf('%1$s=%2$d;%1$s<=%3$d;%1$s++', $index, intval($pieces[2]), intval($pieces[4]));
+        return "<?php" . " for(" . $forStmt . ") { ?>";
     }
 
     /**
@@ -53,7 +49,6 @@ trait ParseCount
 
         $clause = array_pop($this->clauses["count"]);
         $this->releaseVariable($clause["var"]);
-
-        return sprintf('<?php } unset(%1$s); ?>', $clause["var"]);
+        return "<?php" . " } unset(" . $clause["var"] . "); ?>";
     }
 }

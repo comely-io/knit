@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * This file is a part of "comely-io/knit" package.
  * https://github.com/comely-io/knit
  *
@@ -26,11 +26,11 @@ trait ParseIf
      */
     private function parseIf(bool $isElseIf = false): string
     {
-        $statement = $isElseIf ? '<?php } elseif(' : '<?php if(';
+        $statement = $isElseIf ? '<?php' . ' } elseif(' : '<?php' . ' if(';
         $divider = "";
 
         // Check if IF statement has &&
-        if (preg_match('/\s+\&{2}\s+/', $this->token)) {
+        if (preg_match('/\s+&{2}\s+/', $this->token)) {
             $divider .= "&";
         }
 
@@ -103,15 +103,15 @@ trait ParseIf
         }
 
         // Resolve operand
-        if (preg_match('/^\!?\$[a-z\_]+[a-z0-9\_\.\:\|\$\'\"\[\]]*$/i', $operand)) {
+        if (preg_match('/^!?\$[a-z_]+[a-z0-9_.:|\$\'\"\[\]]*$/i', $operand)) {
             // Single variable
             $var = $negate ? substr($operand, 1) : $operand;
             return sprintf("%s%s", $negate, $this->variable($var));
-        } elseif (preg_match('/^(\"|\').*(\"|\')$/', $operand)) {
+        } elseif (preg_match('/^(["\']).*(["\'])$/', $operand)) {
             // Plain string
             $str = addslashes(substr($operand, 1, -1));
             return sprintf('"%s"', $str);
-        } elseif (preg_match('/^\-?[0-9]+(\.[0-9]+)?$/', $operand)) {
+        } elseif (preg_match('/^-?[0-9]+(\.[0-9]+)?$/', $operand)) {
             // Integer or float
             return $operand;
         } elseif (in_array(strtolower($operand), ["true", "false", "null"])) {
@@ -127,7 +127,7 @@ trait ParseIf
      */
     private function parseIfElse(): string
     {
-        return '<?php } else { ?>';
+        return '<?php' . ' } else { ?>';
     }
 
     /**
@@ -140,6 +140,6 @@ trait ParseIf
         }
 
         $this->clauses["if"]--;
-        return '<?php } ?>';
+        return '<?php' . ' } ?>';
     }
 }

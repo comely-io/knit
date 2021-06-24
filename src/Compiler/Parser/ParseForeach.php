@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * This file is a part of "comely-io/knit" package.
  * https://github.com/comely-io/knit
  *
@@ -35,11 +35,13 @@ trait ParseForeach
 
         // Return foreach statement
         $this->clauses["foreach"][] = ["close" => 2, "var" => $index];
-        return sprintf(
-            '<?php if(isset(%1$s) && is_array(%1$s) && count(%1$s)) { foreach(%1$s as %2$s) { ?>',
+        $forEachStmt = sprintf(
+            ' if(isset(%1$s) && is_array(%1$s) && count(%1$s)) { foreach(%1$s as %2$s) { ?>',
             $array,
             $index
         );
+
+        return "<?php" . $forEachStmt;
     }
 
     /**
@@ -59,12 +61,14 @@ trait ParseForeach
 
         // Return foreach statement
         $this->clauses["foreach"][] = ["close" => 2, "var" => $key, "var2" => $val];
-        return sprintf(
-            '<?php if(isset(%1$s) && is_array(%1$s)) { foreach(%1$s as %2$s => %3$s) { ?>',
+        $forEachStmt = sprintf(
+            ' if(isset(%1$s) && is_array(%1$s)) { foreach(%1$s as %2$s => %3$s) { ?>',
             $array,
             $key,
             $val
         );
+
+        return "<?php" . $forEachStmt;
     }
 
     /**
@@ -85,7 +89,7 @@ trait ParseForeach
         $this->clauses["foreach"][$clause]["close"] = 1;
         reset($this->clauses["foreach"]);
 
-        return '<?php } } else { ?>';
+        return "<?php" . " } } else { ?>";
     }
 
     /**
@@ -103,10 +107,6 @@ trait ParseForeach
             $this->releaseVariable($clause["var2"]);
         }
 
-        return sprintf(
-            '<?php %1$s unset(%2$s); ?>',
-            str_repeat('} ', $clause["close"]),
-            $clause["var"]
-        );
+        return "<?php" . sprintf(' %1$s unset(%2$s); ?>', str_repeat('} ', $clause["close"]), $clause["var"]);
     }
 }

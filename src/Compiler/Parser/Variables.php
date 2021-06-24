@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * This file is a part of "comely-io/knit" package.
  * https://github.com/comely-io/knit
  *
@@ -21,15 +21,7 @@ namespace Comely\Knit\Compiler\Parser;
 class Variables
 {
     /** @var array */
-    private $vars;
-
-    /**
-     * Variables constructor.
-     */
-    public function __construct()
-    {
-        $this->vars = [];
-    }
+    private array $vars = [];
 
     /**
      * @param string $var
