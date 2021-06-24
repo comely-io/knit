@@ -1,5 +1,5 @@
-<?php
-/**
+<?php /** @noinspection PhpPropertyOnlyWrittenInspection */
+/*
  * This file is a part of "comely-io/knit" package.
  * https://github.com/comely-io/knit
  *
@@ -24,19 +24,16 @@ use Comely\Knit\Exception\SandboxException;
 class Sandbox
 {
     /** @var array */
-    private $data;
-    /** @var File */
-    private $file;
+    private array $data;
 
     /**
      * Sandbox constructor.
-     * @param File $compiledFile
+     * @param File $file
      * @param Data $data
      */
-    public function __construct(File $compiledFile, Data $data)
+    public function __construct(private File $file, Data $data)
     {
         $this->data = $data->array();
-        $this->file = $compiledFile;
     }
 
     /**
