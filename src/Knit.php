@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * This file is a part of "comely-io/knit" package.
  * https://github.com/comely-io/knit
  *
@@ -24,18 +24,18 @@ use Comely\Knit\Exception\TemplateException;
 class Knit
 {
     /** string Version (Major.Minor.Release) */
-    const VERSION = "2.2.11";
+    const VERSION = "3.0.0";
     /** int Version (Major * 10000 + Minor * 100 + Release) */
-    const VERSION_ID = 20211;
+    const VERSION_ID = 30000;
 
     /** @var Caching */
-    private $caching;
+    private Caching $caching;
     /** @var Directories */
-    private $dirs;
+    private Directories $dirs;
     /** @var Modifiers */
-    private $modifiers;
+    private Modifiers $modifiers;
     /** @var Events */
-    private $events;
+    private Events $events;
 
     /**
      * Knit constructor.

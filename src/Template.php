@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * This file is a part of "comely-io/knit" package.
  * https://github.com/comely-io/knit
  *
@@ -31,22 +31,20 @@ use Comely\Knit\Template\Sandbox;
  */
 class Template
 {
-    /** @var Knit */
-    private $knit;
     /** @var Data */
-    private $data;
+    private Data $data;
     /** @var Metadata */
-    private $metadata;
+    private Metadata $metadata;
     /** @var null|Caching */
-    private $caching;
+    private ?Caching $caching = null;
     /** @var Directory */
-    private $directory;
+    private Directory $directory;
     /** @var string */
-    private $fileName;
+    private string $fileName;
     /** @var string */
-    private $filePath;
+    private string $filePath;
     /** @var bool */
-    private $deleteCompiled;
+    private bool $deleteCompiled = true;
 
     /**
      * Template constructor.
@@ -55,7 +53,7 @@ class Template
      * @param string $fileName
      * @throws TemplateException
      */
-    public function __construct(Knit $knit, Directory $directory, string $fileName)
+    public function __construct(private Knit $knit, Directory $directory, string $fileName)
     {
         try {
             $filePath = $directory->suffix($fileName);
@@ -64,17 +62,15 @@ class Template
             }
         } catch (TemplateException $e) {
             throw $e;
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             throw new TemplateException('Invalid template file name');
         }
 
-        $this->knit = $knit;
         $this->data = new Data();
         $this->metadata = new Metadata();
         $this->directory = $directory;
         $this->fileName = $fileName;
         $this->filePath = $directory->suffix($fileName);
-        $this->deleteCompiled = true;
     }
 
     /**
@@ -191,13 +187,13 @@ class Template
                     // Read cached .knit template
                     try {
                         $cachedTemplate = $cachedFile->read();
-                    } catch (PathException $e) {
+                    } catch (PathException) {
                         throw new CachingException('Cached file could not be read');
                     }
 
                     $cachedStart = substr($cachedTemplate, 0, 6);
                     $cachedEnd = substr($cachedTemplate, -6);
-                    if (!$cachedStart !== "~knit:" || $cachedEnd !== ":knit~") {
+                    if ($cachedStart !== "~knit:" || $cachedEnd !== ":knit~") {
                         throw new CachingException('Bad or incomplete cached knit template');
                     }
 
@@ -210,7 +206,7 @@ class Template
                         throw new CachingException($e->getMessage());
                     }
                 }
-            } catch (PathNotExistException $e) {
+            } catch (PathNotExistException) {
                 // Do nothing if cached file does not exist
             } catch (\Exception $e) {
                 // CachingException messages will be triggered as E_USER_WARNING error
@@ -250,7 +246,7 @@ class Template
         // Get compiled file
         try {
             $compiledFile = $this->knit->dirs()->compiler->file($compiled->compiledFile);
-        } catch (PathException $e) {
+        } catch (PathException) {
             throw new CompilerException(
                 sprintf('Failed to located compiled knit template file "%s"', $compiled->compiledFile)
             );
@@ -271,7 +267,7 @@ class Template
                 $cacheFileName = sprintf('knit_%s.php', $cacheFileId);
                 try {
                     $cacheContents = $compiledFile->read();
-                } catch (PathException $e) {
+                } catch (PathException) {
                     trigger_error('Failed to read compiled knit file for cache', E_USER_WARNING);
                 }
             }
@@ -285,7 +281,7 @@ class Template
 
                 try {
                     $cachingDirectory->write($cacheFileName, $cacheContents, false, true);
-                } catch (PathException $e) {
+                } catch (PathException) {
                     trigger_error('Failed to write knit cache template file', E_USER_WARNING);
                 }
             }
@@ -298,7 +294,7 @@ class Template
         if ($this->deleteCompiled) {
             try {
                 $compiledFile->delete();
-            } catch (PathException $e) {
+            } catch (PathException) {
                 trigger_error('Failed to delete compiled knit template PHP file', E_USER_WARNING);
             }
         }
@@ -352,9 +348,7 @@ class Template
         }
 
         // Timer
-        $template = str_replace('%[%timer.knit%]%', round((microtime(true) - $timer), 5), $template);
-
         // Return processed template
-        return $template;
+        return str_replace('%[%timer.knit%]%', (string)round((microtime(true) - $timer), 5), $template);
     }
 }

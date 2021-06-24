@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * This file is a part of "comely-io/knit" package.
  * https://github.com/comely-io/knit
  *
@@ -30,16 +30,12 @@ use Comely\Knit\Exception\ParseException;
  */
 class Compiler
 {
-    /** @var Knit */
-    private $knit;
-    /** @var Directory */
-    private $directory;
     /** @var File */
-    private $file;
+    private File $file;
     /** @var string */
-    private $fileName;
+    private string $fileName;
     /** @var string */
-    private $eolChar;
+    private string $eolChar = PHP_EOL;
 
     /**
      * Compiler constructor.
@@ -48,26 +44,23 @@ class Compiler
      * @param string $fileName
      * @throws CompilerException
      */
-    public function __construct(Knit $knit, Directory $directory, string $fileName)
+    public function __construct(private Knit $knit, Directory $directory, string $fileName)
     {
-        if (!$directory->permissions()->read()) {
+        if (!$directory->permissions()->readable()) {
             throw new CompilerException(sprintf('Template "%s" directory is not readable', $fileName));
         }
 
         try {
             $file = $directory->file($fileName);
-            if (!$file->permissions()->read()) {
+            if (!$file->permissions()->readable()) {
                 throw new CompilerException(sprintf('Template file "%s" is not readable', $fileName));
             }
-        } catch (PathException $e) {
+        } catch (PathException) {
             throw new CompilerException(sprintf('Template file "%s" not found', $fileName));
         }
 
-        $this->knit = $knit;
-        $this->directory = $directory;
         $this->file = $file;
         $this->fileName = $fileName;
-        $this->eolChar = PHP_EOL;
     }
 
     /**
@@ -80,7 +73,7 @@ class Compiler
         try {
             return (new Parser($this->knit, $this->file->read(), $variables))
                 ->parse();
-        } catch (PathOpException $e) {
+        } catch (PathOpException) {
             throw new CompilerException(
                 sprintf('An error occurred while reading template file "%s"', $this->fileName)
             );
@@ -116,7 +109,7 @@ class Compiler
         $compilerDirectory = $this->knit->dirs()->compiler;
         if (!$compilerDirectory) {
             throw new CompilerException('Knit compiler directory not set');
-        } elseif (!$compilerDirectory->permissions()->write()) {
+        } elseif (!$compilerDirectory->permissions()->writable()) {
             throw new CompilerException('Knit compiler directory not writable');
         }
 
@@ -145,7 +138,7 @@ class Compiler
         // Write
         try {
             $compilerDirectory->write($compiledTemplate->compiledFile, $compile, false, true);
-        } catch (PathException $e) {
+        } catch (PathException) {
             throw new CompilerException('Failed to write compiled knit template file');
         }
 

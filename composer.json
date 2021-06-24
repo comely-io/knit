@@ -13,10 +13,9 @@
     }
   ],
   "require": {
-    "php": "^7.1",
-    "comely-io/data-types": "^1.0.23",
-    "comely-io/utils": "^1.1.10",
-    "comely-io/filesystem": "^1.0.10"
+    "php": "^8.0",
+    "comely-io/utils": "^2.0.3",
+    "comely-io/filesystem": "^2.0.0"
   },
   "autoload": {
     "psr-4": {
